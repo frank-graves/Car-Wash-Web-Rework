@@ -1,0 +1,3 @@
+*.copia.json
+.firebase/
+node_modules/

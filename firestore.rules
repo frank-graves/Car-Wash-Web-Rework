@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /clientes/{id} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['nombre', 'nombre_lower', 'placa', 'telefono', 'lavados_acumulados', 'fecha_registro'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre_lower is string
+        && request.resource.data.lavados_acumulados is number
+        && request.resource.data.lavados_acumulados >= 0;
+      allow delete: if false;
+    }
+
+    match /lavados/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['cliente_id', 'tipo_vehiculo', 'tipo', 'costo', 'fecha', 'fue_gratis', 'nombre_lavador', 'lavador_id', 'metodo_pago'])
+        && request.resource.data.cliente_id is string
+        && request.resource.data.costo is number;
+      allow update, delete: if false;
+    }
+
+    match /lavadores/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['nombre'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 80;
+      allow update, delete: if false;
+    }
+
+  }
+}
